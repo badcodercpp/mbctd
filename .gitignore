@@ -7,6 +7,11 @@ npm-debug.log
 *.dev
 .DS_Store
 
+# data
+*.mp4
+*.ts
+*.m3u8
+
 # Docker
 Dockerfile
 docker-compose.yml
