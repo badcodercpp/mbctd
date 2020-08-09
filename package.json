@@ -23,6 +23,7 @@
     "ejs": "^2.5.6",
     "express": "^4.15.2",
     "express-useragent": "^1.0.13",
+    "fcm-node": "^1.5.2",
     "ffmpeg": "0.0.4",
     "fluent-ffmpeg": "^2.1.2",
     "fs": "0.0.1-security",
@@ -35,7 +36,8 @@
     "node-mysql": "^0.4.2",
     "sendotp": "^1.2.9",
     "socket.io": "^2.3.0",
-    "twilio": "^3.47.0"
+    "twilio": "^3.47.0",
+    "unique-names-generator": "^4.3.0"
   },
   "devDependencies": {
     "request": "^2.81.0",

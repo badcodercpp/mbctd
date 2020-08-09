@@ -33,6 +33,9 @@ const PORT = process.env.PORT || 5001;
 const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://mayank0904:badcoder1993@cluster0.g4rhc.mongodb.net/bad?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true  });
+
+var FCM = require('fcm-node');
+
 // client.connect(err => {
 //   const collection = client.db("bad").collection("devices");
 //   // perform actions on the collection object
@@ -74,6 +77,89 @@ app.use(useragent.express());
 app.get('/test', (req, res) => {
   res.send('hello world')
 });
+
+const sendPush = (deviceId) => {
+  const serverKey = 'AAAAOtK9bxk:APA91bGyO2u7yd5KuHuJrk7YbcX5_hH-AAtcoLuhrNSDMFOSJHecuXOPN_Dr5rdEEBJjAFKTVNL4VCR7FbIow6TFmn6lul9HbrScT2wagZfaXzBM-llXwCrcgX9WxgICszDO1DZJ0QYs'; //put your server key here
+    const fcm = new FCM(serverKey);
+ 
+    var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+        to: deviceId, 
+        
+        notification: {
+            title: 'This is dummy push ', 
+            body: 'Body of dummy push notification' 
+        },
+        
+        data: {  //you can send only notification or only data(or include both)
+            my_key: 'my value',
+            my_another_key: 'my another value'
+        }
+    };
+    
+    fcm.send(message, function(err, response){
+        if (err) {
+            console.log("Something has gone wrong!", err);
+        } else {
+            console.log("Successfully sent with response: ", response);
+        }
+    });
+}
+
+app.post('/saveFCMDeviceId', jsonParser, (req, res) => {
+  const body = req.body || {};
+  console.log("bbody", body)
+  const {FCMDeviceID, userName} = body;
+  const c1 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true  });
+      c1.connect(async function() {
+        try {
+          const db = c1.db("meewee")
+          const r = await db.collection('FCMDeviceID').insertOne({FCMDeviceID, userName});
+          sendPush(FCMDeviceID);
+          res.send(r)
+        } catch (e) {
+            console.log (e);
+            res.send(e);
+        } finally {
+          c1.close();
+        }
+      })
+})
+
+app.post('/mwRegister', jsonParser, (req, res) => {
+  const body = req.body || {};
+  const {register = {}} = body;
+  const {otp, mobile} = register;
+  const c1 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true  });
+      c1.connect(async function() {
+        try {
+          const r = await db.collection('mwotp').findOne({mobile});
+          const otpInDb = _get(r, 'otp');
+          if (_isEqual(otp, otpInDb)) {
+            const c = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true  });
+            c.connect(async function() {
+              const db = client.db('bad')
+              try {
+                const data = {...mixin, ...register};
+                const r = await db.collection('mwuser').insertOne(data);
+                res.send({ mobile });
+              } catch (e) {
+                  console.log (e);
+                  res.send(e);
+              } finally {
+                c.close();
+              }
+            });
+          }
+          res.send(r);
+        } catch (e) {
+            console.log (e);
+            res.send(e);
+        } finally {
+          c1.close();
+        }
+      })
+  
+})
 
 app.post('/login', jsonParser, (req, res) => {
   return doLogin(req, res)
@@ -131,7 +217,7 @@ app.get('/sendOtp/:mobile', (req, res) => {
     const otp = Math.floor(1000 + Math.random() * 9000)
     sendOtp(undefined, otp).then(() => {
       client.connect(async function() {
-        const db = client.db('bad')
+        const db = client.db('meewee')
         try {
           const data = {mobile, otp};
           console.log(data);

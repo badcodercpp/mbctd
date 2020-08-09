@@ -170,25 +170,7 @@ export const user = {
             ],
         }
     },
-    followers: [
-        {
-            id: '5f06c4c52c070b35b8150ad2',
-            name: 'Ajay Jha',
-            mobile: '9836648105',
-            avatar: {
-                uri: 'https://picsum.photos/200/300'
-            }
-        },
-        {
-            id: '6845167057860820994',
-            name: 'Kashish Chopra',
-            mobile: '9470717982',
-            avatar: {
-                uri: 'https://picsum.photos/200/300'
-            }
-        }
-    ],
-    followings: [
+    buddies: [
         {
             id: '5f06c4c52c070b35b8150ad2',
             name: 'Ajay Jha',
